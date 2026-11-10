@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "algotradinghub": {
+      "type": "http",
+      "url": "https://app.algotradinghub.io/api/mcp"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+# A user's own pipeline — their ideas, strategies and results — is private and never committed.
+/pipeline/
+/settings.yaml
+
+# Local agent settings
+.claude/settings.local.json
+
+# The visual desk's generated timelines (built from the private pipeline)
+/viz/out/

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visual Desk</title>
+  <link rel="icon" href="data:,">
+  <style>
+    html, body { margin: 0; height: 100%; background: #0d0e16; overflow: hidden; }
+    body { display: flex; align-items: center; justify-content: center; }
+    canvas { display: block; image-rendering: pixelated; }
+  </style>
+</head>
+<body>
+  <canvas id="desk"></canvas>
+  <!-- From file://, the replay comes from viz/out/timeline.js (node viz/build-timeline.mjs), or ?file=private for
+       viz/out/private.js. Served by node viz/server.mjs, it comes from /api/timeline or /api/live instead. -->
+  <script>
+    if (location.protocol === 'file:') {
+      const name = (new URLSearchParams(location.search).get('file') || 'timeline').replace(/[^a-z0-9_-]/gi, '');
+      document.write('<script src="out/' + name + '.js"><' + '/script>');
+    }
+  </script>
+  <script src="engine.js"></script>
+  <script src="people.js"></script>
+  <script src="floor.js"></script>
+  <script src="desk.js"></script>
+</body>
+</html>

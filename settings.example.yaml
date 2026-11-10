@@ -1,0 +1,189 @@
+# The desk's settings. Copy this file to settings.yaml (kept private, never committed) and edit it.
+# Every value here is a default; docs/design.md says what each one decides.
+
+owner:
+  portfolios: []              # the owner's own portfolios on the platform, by name (list_portfolios): what the owner
+                              # already trades, so the head of desk steers research toward what they lack
+  goal: ""                    # one line: what the owner's book is for (e.g. "the best portfolio for a 10K prop challenge on
+                              # <rule set>"); the head of desk steers research by it, the portfolio manager judges by it
+  research_portfolio: ""      # optional: a copy of the owner's live portfolio, by name, that the owner hands to the desk to
+                              # improve; the desk changes its slots, never the live one's
+  goal_constraints: []        # the goal account's rules a card must follow, e.g. weekend_flat (a funded
+                              # account that must be flat over the weekend); the analyst writes cards to them
+
+windows:
+  history_years: 10           # the most recent N years of the instruments' common history (or all of it, when shorter)
+  holdout_share: 0.20         # the most recent share of that window, sealed until the hold-out stage
+                              # one sealed date for the whole desk: an instrument with a shorter history whose own split
+                              # falls later still uses it (the stricter), so every card shares one development window
+
+pass_bar:                     # the baseline (V1), the optimization's confirmation (V2) and the hold-out (V6)
+  min_profit_factor: 1.15
+  hedge_min_profit_factor: 1.0  # a card the analyst marked a hedge: it must not lose after costs (V1, V2, V6); it
+                              # stays only if it improves the owner's research portfolio (roles/portfolio-manager.md)
+  min_trades_per_8_years: 100 # scaled to each window's length
+
+account:                      # the simulated account every backtest runs on, so results compare
+  currency: USD
+  initial_balance: 100000
+  leverage: 30
+
+costs:
+  broker_preset: ""           # your broker's cost preset on the platform, by name (list_virtual_symbols); empty: ask
+                              # the owner before costing anything
+  fallback_presets: []        # other presets by name, in order, for an instrument the preset doesn't cover;
+                              # none covers it: the instrument is not testable and is never backtested
+  # Slippage charged on every fill, in POINTS: one point is the instrument's tick size, 10^-digits (0.00001 on EURUSD,
+  # 0.001 on USDJPY, 0.01 on XAUUSD and the indices). The platform charges it on every fill, stops, targets and closes
+  # included. The desk's estimates of a retail raw-spread account's average, about half the usual spread outside the
+  # quiet hours; not measured. Replace them with your own broker's when you know them.
+  slippage_points:
+    # Forex majors: 0.2 pip
+    EURUSD: 2
+    GBPUSD: 2
+    USDJPY: 2
+    USDCHF: 2
+    USDCAD: 2
+    AUDUSD: 2
+    NZDUSD: 2
+    # Forex crosses: 0.3-0.5 pip
+    EURGBP: 3
+    EURJPY: 3
+    EURCHF: 3
+    EURAUD: 4
+    EURCAD: 4
+    EURNZD: 5
+    GBPJPY: 4
+    GBPCHF: 4
+    GBPAUD: 5
+    GBPCAD: 5
+    GBPNZD: 5
+    AUDJPY: 3
+    AUDCAD: 3
+    AUDCHF: 3
+    AUDNZD: 4
+    CADJPY: 3
+    CADCHF: 4
+    CHFJPY: 4
+    NZDJPY: 4
+    NZDCAD: 4
+    NZDCHF: 4
+    # Forex, Singapore and Hong Kong dollar pairs: wider spreads
+    USDSGD: 10
+    EURSGD: 15
+    AUDSGD: 15
+    CHFSGD: 15
+    SGDJPY: 10
+    USDHKD: 5                 # 4 digits: one point is 0.0001
+    EURHKD: 50
+    CADHKD: 50
+    HKDJPY: 10
+    # Metals
+    XAUUSD: 10                # $0.10
+    XAGUSD: 10                # $0.010
+    XPTCMDUSD: 50             # $0.50
+    XPDCMDUSD: 100            # $1.00
+    COPPERCMDUSD: 10          # $0.0010
+    # Energy
+    LIGHTCMDUSD: 2            # $0.02
+    BRENTCMDUSD: 2
+    GASCMDUSD: 5              # $0.005
+    DIESELCMDUSD: 500         # $0.50 a ton
+    # Softs (the USX ones are quoted in US cents)
+    COCOACMDUSD: 100          # $10 a ton
+    SUGARCMDUSD: 500          # $0.50 a ton
+    COFFEECMDUSX: 30          # 0.30 cents
+    COTTONCMDUSX: 5           # 0.05 cents
+    OJUICECMDUSX: 500         # 0.50 cents
+    SOYBEANCMDUSX: 50         # 0.50 cents
+    # Indices
+    USA500IDXUSD: 30          # 0.3 index points
+    USATECHIDXUSD: 75
+    USA30IDXUSD: 100
+    USSC2000IDXUSD: 20
+    DEUIDXEUR: 100
+    EUSIDXEUR: 50
+    FRAIDXEUR: 50
+    GBRIDXGBP: 50
+    ESPIDXEUR: 200
+    NLDIDXEUR: 10
+    CHEIDXCHF: 150
+    JPNIDXJPY: 500
+    HKGIDXHKD: 500
+    AUSIDXAUD: 50
+    CHIIDXUSD: 300
+    SGDIDXSGD: 20
+    DOLLARIDXUSD: 10          # 3 digits: 0.010
+    # Crypto
+    BTCUSD: 1000              # $10
+  # Spreads: backtests charge the spread recorded in the platform's price history. A virtual symbol can
+  # replace it (a fixed spread, a markup, or time windows with their own spread) when your broker's differs.
+  # The desk's own copy of each instrument's preset (symbol: virtual symbol id): the preset with the slippage above and
+  # the swap restated as a percent a year at the preset's capture price (roles/quant.md, "The desk's own copies").
+  # The quant fills it as instruments come up; every run charges through these.
+  desk_symbols: {}
+  desk_symbols_stressed: {}  # the same, slippage times robustness.stressed_slippage_factor (roles/quant.md, V3)
+
+sizing:
+  default_risk_percent: 0.5   # the desk default when an idea's source doesn't size: risk per trade, at the stop
+
+research:
+  min_edge_to_cost: 3         # the average move captured per trade must be at least this many round-trip costs
+
+optimization:
+  max_parameters: 3
+  max_points_per_axis: 7      # a coarse grid: few values per parameter
+
+robustness:                   # V3
+  stressed_slippage_factor: 3 # slippage multiplied by this on the stressed run
+  min_profit_factor_stressed: 1.0
+  hedge_min_profit_factor_stressed: 0.95  # the same for a hedge card
+  monte_carlo_max_ruined_share: 0      # the share of reorderings that may end ruined
+  monte_carlo_max_dd_p95_percent: 50   # the worst 5% of reorderings may draw down at most this, % of the high
+  related_min_share_profitable: 0.5    # fewer related instruments in profit than this share: a warning, never a fail
+  blocks: 4                            # the development window cut into this many equal blocks...
+  min_profitable_blocks: 3             # ...of which at least this many end with a profit factor above 1
+
+walk_forward:                 # V4, on the development window only
+  in_sample_months: 36        # each fold re-optimizes the V2 grid on this many months...
+  out_of_sample_months: 12    # ...and trades its pick on the next this-many months, unseen by that sweep
+  min_folds: 3                # fewer at these lengths: the in-sample shrinks (roles/quant.md)
+  selection_metric: ""        # the metric each fold picks its winner by; empty = the platform's default
+  min_efficiency: 0.5         # out-of-sample profit per year / the picks' in-sample profit per year
+  min_profitable_folds_share: 0.6  # the folds whose out-of-sample stretch made money, at least this share
+
+incubation:
+  demo_account: ""            # the demo broker account incubation deploys to (its name in list_broker_accounts)
+  min_trades: 20
+  min_weeks: 4
+  max_months: 3
+  check_every_days: 7         # how often the verifier matches live trades against the backtest
+
+portfolio:                    # the checks for a portfolio on the owner's OWN capital; a prop-firm portfolio is judged
+                              # by the firm's rules and the prop simulation instead (roles/prop-strategist.md)
+  max_pair_correlation: 0.6   # of daily returns, for any two strategies in one portfolio
+  max_peak_margin_percent: 80 # the peak combined margin, % of the combined equity at that moment
+  max_dd_p95_percent: 50      # the portfolio Monte Carlo's worst 5% drawdown
+
+prop:
+  rule_sets: []               # as named in list_prop_rule_sets; empty = all presets
+  account_sizes: []           # the account sizes to study; empty = every size the rule set offers
+  account_currency: ""        # the challenge account's currency; empty = the rule set's own
+  horizon_months: 24
+
+autonomy:
+  demo_deployments: true      # the desk deploys, pauses and stops on demo accounts on its own
+  sweeps: true                # the owner's standing yes to sweep and walk-forward run counts; the platform's limits are the only cap
+  run_desk: true              # the head of desk dispatches every role on its own, in a loop, without the owner watching
+                              # (docs/design.md §7); false = the owner starts each role
+  owner_attention:            # the only things the desk brings to the owner; everything else the head of desk decides
+    - question                # a question the settings, the charter, the playbooks and the owner's rulings don't answer
+    - research_portfolio      # a validated strategy proposed for the owner's research portfolio, or any change to it
+    - live                    # anything about the owner's live book or a real-money account
+    - spending                # a plan change, a purchase, a prop challenge
+
+wip:                          # how many cards may wait in a stage's ready/ before the stage before it stops
+  leads_waiting: 10
+  cards_waiting_build: 5
+  cards_waiting_verify: 3
+  cards_waiting_validate: 3
