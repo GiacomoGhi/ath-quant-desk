@@ -49,6 +49,9 @@ The protocol (IDs, claiming, logs, limits) is in [`pipeline.md`](pipeline.md).
 
 - **A card is a folder**, `Q-0001-short-name/`, holding `card.md` (the idea, its rules, its windows, each stage's
   pre-registered criteria and results) and `log.md` (every step, by which role, with the platform runs it made).
+- **Warnings travel with the strategy.** What doesn't fail a stage but matters (the walk-forward, related
+  instruments) is written in the card's Warnings section, under its title, and repeated wherever the strategy is used:
+  portfolio cards, prop plans, the weekly report ([`pipeline.md`](pipeline.md), Warnings).
 - **The desk never deletes anything on the platform.** Retired ideas stay there, and stay counted.
 - **One idea, one strategy.** The card ID starts the strategy's name on the platform (`Q-0001 Short name`). Every
   variant is a new **revision** of the same strategy, never a duplicate. A genuinely different idea gets a new card.
@@ -72,9 +75,9 @@ the result.
 | **B. Build** | builder | The strategy written as the card says; windows fixed; one smoke run | The platform validates it and it trades | runs |
 | **C. Verify** | verifier | Trades checked against the card's rules and the prices | Every rule fires as written | runs |
 | **V1. Baseline** | quant | Default parameters, development window, the owner's broker costs | `pass_bar` | runs |
-| **V2. Optimization** | quant | A small grid fixed in the card before the sweep; the chosen variant from a stable region, confirmed by a backtest | The confirmation passes `pass_bar` | runs |
+| **V2. Optimization** | quant | In blocks of one or two related parameters, in an order fixed in the card before any run, once through: each block's sweep picks from a stable region by recovery factor and keeps the pick only on a clear improvement; then a cliff check one step around every tuned value | Each confirmation passes `pass_bar`; the cliff check stays profitable | runs |
 | **V3. Robustness** | quant | Costs stressed; the backtest Monte Carlo; the development window in blocks; the idea on related instruments, each at its own session (a warning, not a fail) | `robustness` | runs |
-| **V4. Walk-forward** | quant | The platform's walk-forward on the development window: the V2 grid re-optimized on rolling stretches, each pick traded on the months after it | `walk_forward` | runs |
+| **V4. Walk-forward** | quant | The platform's walk-forward on the development window: the first block's grid re-optimized on rolling stretches, each pick traded on the months after it | Never fails: `walk_forward` sets its warnings | runs |
 | **V5. Selection bias** | quant | The platform's correction for the variants the idea tried; for long-biased ideas, the buy-and-hold comparison | set when the stage runs | **waits** for platform support |
 | **V6. Hold-out** | quant | One run on the hold-out window, the chosen variant only | `pass_bar` on the hold-out. Fail = retired, never retuned | **waits** (comes after V5) |
 | **P. Incubation** | portfolio manager deploys, verifier judges | Demo account, live trades against the backtest of the same days (§4a) | `incubation` | runs |

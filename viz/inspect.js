@@ -77,6 +77,7 @@
   #insp .md th { background: rgba(111,168,255,0.1); color: #fff; }
   #insp .md blockquote { border-left: 3px solid rgba(111,168,255,0.5); margin: 8px 0; padding: 2px 12px; color: #b8c0d6; }
   #insp .md .meta { font-size: 13px; color: #8b93a8; margin-bottom: 10px; }
+  #insp .warnbox { border: 1px solid rgba(255,179,64,0.55); background: rgba(255,179,64,0.08); border-radius: 10px; padding: 4px 14px; color: #ffe2b0; }
   #insp .result { border: 1px solid rgba(56,224,140,0.35); background: rgba(56,224,140,0.06); border-radius: 10px; padding: 4px 14px; }
   #insp .toc a { display: inline-block; margin: 2px 10px 2px 0; font-size: 13px; }
   `;
@@ -205,6 +206,7 @@
       ${holder ? `<p>Being carried by ${holder} right now.</p>` : last ? `<p class="muted">Last touched by ${actorLink(actorKey(last))} at ${hhmm(last.t)}.</p>` : ''}
       ${lc?.source ? `<h3>Where the idea comes from</h3><p>${linkify(esc(lc.source))}</p>` : ''}
       ${lc?.last ? `<h3>Latest step in its log (now)</h3><p class="small">${linkify(esc(lc.last))}</p>` : ''}
+      <div id="warn"></div>
       <div id="res"></div>
       ${canRead ? '' : privNote()}
       <h3>Its day so far</h3>${eventRows(evs, { showCard: false })}`;
@@ -212,9 +214,17 @@
     if (canRead) {
       const d = await doc(`card/${id}/card`);
       if (!d || current?.id !== id || current?.tab !== 'overview') return;
+      const warn = warningsOf(d.text);
+      if (warn) { const box = body.querySelector('#warn'); box.innerHTML = `<h3>Warnings</h3><div class="warnbox md">${md(warn)}</div>`; wire(box); }
       const res = latestResult(d.text);
       if (res) { const box = body.querySelector('#res'); box.innerHTML = `<h3>Latest result in the card (now)</h3><div class="result md">${md(res)}</div>`; wire(box); }
     }
+  }
+  // the card's Warnings section (docs/pipeline.md), unless it says "None"
+  function warningsOf(text) {
+    const m = /^##\s+Warnings\s*$([\s\S]*?)(?=^##\s|(?![\s\S]))/m.exec(text.replace(/\r\n/g, '\n'));
+    const body = m && m[1].replace(/<!--[\s\S]*?-->/g, '').trim();
+    return body && !/^none\.?$/i.test(body) ? body : null;
   }
   // the card's last section about a result or verdict, so "how is it doing" is one click
   function latestResult(text) {

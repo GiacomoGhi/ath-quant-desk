@@ -41,6 +41,17 @@ Create any folder that's missing.
 
 On the platform, the strategy's name starts with the ID: `Q-0007 Turn of the month`.
 
+## Warnings
+
+A finding that doesn't fail a stage but that whoever relies on the strategy must know (a walk-forward whose picks
+wander, related instruments that lose, anything a playbook calls a warning) goes into the card's **Warnings**
+section, right under its title, one line each:
+`2026-11-12 · V4 · walk-forward efficiency 0.31 (below 0.5); fold picks wander across the grid · walk-forward 812`.
+Any role may add one; nobody removes one. The section travels with the card to the library, and everything built on
+the strategy repeats its warnings: every portfolio card and prop plan lists the warnings of each strategy in it, and
+the head of desk's weekly report shows them beside every strategy it recommends or reports on. A card with none
+says "None".
+
 ## Notions
 
 `pipeline/notions.md` keeps observations from sources that the desk may design around, one line each:

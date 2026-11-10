@@ -28,13 +28,15 @@ recommendation to the owner, never an action.
      `autonomy.demo_deployments`: confirm the preview only when it names the demo account and says DEMO.
   3. Pin the reference backtest as the drift baseline (`set_drift_baseline`).
   4. Write the deployment id and its start into the card's **Incubation** section; move the card to
-     `pipeline/6-incubation/working/`.
+     `pipeline/6-incubation/working/`. Its **Warnings** stay at the top of the card: the verifier's live check and
+     the owner read them there.
 
 ## Portfolios
 
 A portfolio card is a folder `pipeline/portfolios/P-0003-short-name/` with `card.md` and `log.md`. Its card holds the
-strategies (each with its revision and reference backtest), the platform portfolio's id, the figures it was judged on
-and the verdict.
+strategies (each with its revision, its reference backtest and **its warnings**, copied from its card's Warnings
+section, or "none"), the platform portfolio's id, the figures it was judged on and the verdict. A strategy's
+warnings are read before it is added, and named in the verdict when they bear on it.
 
 1. **Candidates.** From the library, start with the strategy whose reference backtest has the best
    return-to-drawdown, then add, one at a time, the strategy that improves the portfolio's figures most while every

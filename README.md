@@ -67,14 +67,16 @@ validation and portfolio work run behind it. The protocol (ids, claiming by movi
 | B. Build | builder | The strategy written as the card says; one smoke run |
 | C. Verify | verifier | Every rule fires as written, checked against the prices |
 | V1. Baseline | quant | Default parameters on the development window, with the owner's broker costs |
-| V2. Optimization | quant | A small grid fixed in advance; the variant chosen from a stable region, then confirmed |
+| V2. Optimization | quant | Related parameters tuned in blocks of one or two, in an order fixed in advance: each block picks from a stable region and keeps a change only when it clearly helps; then a check that the result isn't on a cliff |
 | V3. Robustness | quant | Stressed costs, Monte Carlo, the window in blocks, related instruments |
-| V4. Walk-forward | quant | Re-optimized on rolling stretches, each pick traded on the months after it |
+| V4. Walk-forward | quant | The setup re-optimized on rolling stretches, each pick traded on the months after it (a warning, never a fail) |
 | V5. Selection bias | quant | A correction for the variants the idea tried |
 | V6. Hold-out | quant | One run on the sealed window. Fail = retired |
 | P. Incubation | portfolio manager, verifier | Demo trading, matched trade by trade against the backtest of the same days |
 
-A stage the platform can't run yet waits; the desk never stands in for it. Every threshold lives in the owner's
+A stage the platform can't run yet waits; the desk never stands in for it. What doesn't fail a stage but matters is
+written in the card's **Warnings** and travels with the strategy into every portfolio, prop plan and
+report. Every threshold lives in the owner's
 settings ([`settings.example.yaml`](settings.example.yaml)). The full design is in [`docs/design.md`](docs/design.md).
 
 ## Getting started

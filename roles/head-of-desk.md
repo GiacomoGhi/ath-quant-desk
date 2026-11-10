@@ -101,10 +101,12 @@ start each one with its playbook, read what it reports, and start the next. You 
 `pipeline/reports/2026-W46.md`, written for the owner in plain language:
 
 1. **The pipeline:** cards per stage, what moved this week, what passed each stage and what was retired, with the
-   reasons.
-2. **Live:** the incubating strategies, their live checks and verdicts; the portfolios on demo and their drift.
+   reasons. Beside every card that passed a stage, its warnings from the card's Warnings section, or "no warnings".
+2. **Live:** the incubating strategies with their warnings, their live checks and verdicts; the portfolios on demo
+   and their drift.
 3. **Recommendations for the owner:** portfolios ready for a real-money decision; the best prop plans (expected value
-   net of fees, pass odds, the rules not simulated). Facts only; the decision is the owner's.
+   net of fees, pass odds, the rules not simulated). Every strategy in them with its warnings, in full. Facts only;
+   the decision is the owner's.
 4. **Platform usage** against the plan.
 5. **Platform gaps:** each one, how many ideas it holds back, and since when.
 6. **Problems:** stuck cards, idle roles, playbook rules that agents found unclear.

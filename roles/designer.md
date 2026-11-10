@@ -28,7 +28,8 @@ Every design is written before anyone sees a result.
 - **Build for the account.** Hold long enough for the move to clear costs several times over
   (`research.min_edge_to_cost`), short enough to give a few hundred trades in the development window, flat when the
   goal's rules say so. Prefer both directions, or the side the book lacks.
-- **Few parameters,** each with a reason for its default, and at most `optimization.max_parameters` to sweep.
+- **Few parameters,** each with a reason for its default. Which to tune, and in which blocks, is the analyst's
+  optimization plan (roles/analyst.md); a design that needs many knobs to work is not one mechanism.
 - **Check the sign and the count before you write.** Today's designs died at the analyst on three things: the very
   source the notion came from showed the opposite direction in the conditions the design trades (an all-days average
   that reverses on the days the design picks); the trades clustered into too few independent events; the move

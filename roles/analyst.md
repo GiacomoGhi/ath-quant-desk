@@ -73,9 +73,19 @@ parameter defaults, departures from the source) is made from the source and from
 - **Sizing.** Use the source's sizing if the edge depends on it; otherwise the desk default (`sizing` in the
   settings), which is risk at the stop: for a strategy without a stop, size each position to a volatility target
   instead (a fixed share of the balance per ATR), and derive it in the card.
-- **Parameters.** Defaults come from the source. Give each a plausible range from the source or from reasoning. Mark
-  at most `optimization.max_parameters` as "to optimize": the ones the edge is most sensitive to by its own logic. The
-  rest stay fixed at their defaults.
+- **Parameters.** Defaults come from the source. Give each a plausible range from the source or from reasoning.
+- **The optimization plan.** Choose which parameters the quant will tune, and group them into **blocks** (the
+  quant's V2 sweeps them one block at a time, once, in your order):
+  - Tune a parameter only when the edge is sensitive to it by its own logic and the source leaves its best value
+    uncertain. Every other parameter stays fixed at its default.
+  - A block holds one or two parameters (at most `optimization.max_parameters_per_block`) that belong together:
+    they shape the same part of the trade, so one can't be judged without the other (a range's start and end; a take
+    profit and a stop loss). Unrelated parameters go in separate blocks.
+  - Order the blocks by the mechanism: first what defines the setup (the range, the signal), then the exits, then the
+    timing around them (closing hour, order expiry). Say why, in one line per block.
+  - Give each axis its range and a step, so each block's grid stays within `optimization.max_runs_per_sweep` runs.
+  - There is no limit on the number of blocks, but each one must earn its place: a block that only adds a knob to
+    turn is overfitting waiting to happen. Every sweep counts against the idea later (V5).
 - **Expected frequency.** Estimate trades per year from the source or from the rules (a monthly signal is about 12 a
   year). Compare with `pass_bar.min_trades_per_8_years`.
 - **Costs.** Compare the average move the strategy captures per trade (from the source, or a reasoned estimate) with

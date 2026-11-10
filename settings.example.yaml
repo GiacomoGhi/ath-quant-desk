@@ -130,9 +130,12 @@ sizing:
 research:
   min_edge_to_cost: 3         # the average move captured per trade must be at least this many round-trip costs
 
-optimization:
-  max_parameters: 3
-  max_points_per_axis: 7      # a coarse grid: few values per parameter
+optimization:                 # V2: the card's parameters tuned in blocks, once through (roles/quant.md)
+  max_parameters_per_block: 2 # related parameters swept together; never more
+  max_runs_per_sweep: 2000    # one block's grid; the platform's wall for a bar-mode sweep
+  rank_by: recoveryFactor     # net profit / maximum drawdown: more profit, or a little less for a much smaller drawdown
+  min_improvement: 0.10       # a block keeps its pick only when the recovery factor rises at least this share...
+  max_profit_giveback: 0.20   # ...and net profit falls at most this share, both against the current values
 
 robustness:                   # V3
   stressed_slippage_factor: 3 # slippage multiplied by this on the stressed run
@@ -144,13 +147,14 @@ robustness:                   # V3
   blocks: 4                            # the development window cut into this many equal blocks...
   min_profitable_blocks: 3             # ...of which at least this many end with a profit factor above 1
 
-walk_forward:                 # V4, on the development window only
-  in_sample_months: 36        # each fold re-optimizes the V2 grid on this many months...
+walk_forward:                 # V4, on the development window only; a warning, never a fail
+  in_sample_months: 36        # each fold re-optimizes the first block's grid on this many months...
   out_of_sample_months: 12    # ...and trades its pick on the next this-many months, unseen by that sweep
   min_folds: 3                # fewer at these lengths: the in-sample shrinks (roles/quant.md)
-  selection_metric: ""        # the metric each fold picks its winner by; empty = the platform's default
-  min_efficiency: 0.5         # out-of-sample profit per year / the picks' in-sample profit per year
-  min_profitable_folds_share: 0.6  # the folds whose out-of-sample stretch made money, at least this share
+  max_grid_points: 400        # the first block's grid, coarsened to at most this many points (every fold sweeps it)
+  selection_metric: recoveryFactor  # the metric each fold picks its winner by; empty = the platform's default
+  min_efficiency: 0.5         # below this (out-of-sample profit per year / the picks' in-sample one): a warning
+  min_profitable_folds_share: 0.6  # fewer folds than this share making money out of sample: a warning
 
 incubation:
   demo_account: ""            # the demo broker account incubation deploys to (its name in list_broker_accounts)

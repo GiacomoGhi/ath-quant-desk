@@ -11,6 +11,11 @@ expected_trades_per_year: <number>
 
 # Q-0000 <Short name>
 
+## Warnings
+
+None. <!-- Every stage adds its warnings here, one line each: date · stage · what, with its figures · run id.
+     Nobody removes one; they travel with the strategy into every portfolio, prop plan and report. -->
+
 ## Hypothesis
 
 <One sentence: what happens in the market, and how the strategy profits from it.>
@@ -36,11 +41,19 @@ expected_trades_per_year: <number>
 
 ## Parameters
 
-| Parameter | Default (from the source) | Plausible range | To optimize |
+| Parameter | Default (from the source) | Plausible range | Block |
 |---|---|---|---|
-| | | | yes / no |
+| | | | — / 1 / 2 … |
 
-At most `optimization.max_parameters` marked "yes".
+## Optimization plan
+
+The blocks the quant tunes at V2, once each, in this order. One or two related parameters per block
+(`optimization.max_parameters_per_block`); each grid within `optimization.max_runs_per_sweep` runs. Parameters in no
+block stay at their defaults. "None" when nothing is tuned.
+
+| Block | Parameters | Range and step | Why together, and why at this point in the order |
+|---|---|---|---|
+| 1 | | | |
 
 ## Related instruments
 
@@ -74,7 +87,8 @@ decided without looking at any results>
 - [ ] Not a duplicate of a card in any stage, `parked/` or `retired/`
 - [ ] Expected trades meet the settings' minimum
 - [ ] The edge per trade clears the costs
-- [ ] At most the allowed number of parameters to optimize
+- [ ] The optimization plan: blocks of related parameters (at most two each), ordered by the mechanism, each grid
+      within the run limit
 
 <!-- Later stages add their own sections below, in this order: Windows and Build (builder), Verify (verifier),
      Validation and Hold-out (quant), Incubation (portfolio manager and verifier). -->

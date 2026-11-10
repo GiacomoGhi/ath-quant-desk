@@ -28,8 +28,9 @@ and minimum trading days change what a good portfolio is. You build your own pro
 5. **Compliance.** `check_prop_compliance` on the trades of every plan you'd recommend, against the firm's trade rules.
 6. **Plans.** For each rule set, the best combination by expected value net of fees over the horizon, written as a
    plan card `pipeline/prop/F-0002-short-name/card.md`: the firm and rule set, the size, the portfolio and its
-   strategies, the size factor; the pass odds, time to pass, funded survival, expected payouts, fees and the net
-   expected value; the rules the simulation does not cover and how the portfolio stands against them; compliance.
+   strategies with each one's warnings (copied from its card's Warnings section, or "none"), the size factor; the
+   pass odds, time to pass, funded survival, expected payouts, fees and the net expected value; the rules the
+   simulation does not cover and how the portfolio stands against them; compliance.
 7. The head of desk carries the best plans to the owner in the weekly report.
 
 ## Judging a plan
