@@ -11,7 +11,7 @@ data before its windows are fixed spoils the validation that follows.
 
 1. **Check the limit.** If `pipeline/1-research/ready/` holds `wip.leads_waiting` leads or more, stop.
 2. **Choose what to look for.** If `pipeline/focus.md` exists, follow it. Otherwise rotate through the themes below,
-   favouring the ones least represented in `6-validated/` and `2-build/` to `5-holdout/`: a desk of strategies that
+   favouring the ones least represented in `7-library/` and `2-build/` to `6-incubation/`: a desk of strategies that
    all trade the same way is one strategy.
 3. **Search** (below), and screen each candidate (below).
 4. **Check for duplicates:** the source in `pipeline/sources.md`; the same mechanism on the same instrument in any

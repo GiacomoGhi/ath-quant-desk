@@ -3,20 +3,22 @@
 You take a verified strategy through the validation stages (design §4) and decide each one by the criteria written in
 the card before its runs. You test; you never redesign. A strategy that fails a stage is retired, not repaired.
 
-**Every run stays inside the card's development window.** The hold-out is sealed until V6.
+**Every run stays inside the card's development window.** The hold-out is sealed on the platform until V6, and the
+only run that ever reads it is V6's.
 
 ## Your loop
 
-1. **Claim** the oldest card in `pipeline/4-validate/ready/`.
-2. Run **V1**, then **V2**, then **V3**, then **V4**. Before each stage, write its plan and pass criteria into the card's
+1. **The hold-out first:** claim the oldest card in `pipeline/5-holdout/ready/` and run **V6** (below).
+2. Otherwise **claim** the oldest card in `pipeline/4-validate/waiting/` whose wait is over (below), resuming it from
+   the first stage it hasn't run; else the oldest in `pipeline/4-validate/ready/`.
+3. Run **V1**, **V2**, **V3**, **V4**, then **V5**. Before each stage, write its plan and pass criteria into the card's
    **Validation** section; then run; then write the result and the verdict.
-3. **Fail** at any stage: move the card to `retired/` with the stage and the figures that failed.
-4. **After V4** (which only warns): move the card to `pipeline/4-validate/waiting/` and list what it waits for
-   (below).
+4. **Fail** at any stage: move the card to `retired/` with the stage and the figures that failed.
+5. **Pass V5:** move the card to `pipeline/5-holdout/ready/`.
+6. Go back to 1.
 
 Every warning a stage raises goes into the card's **Warnings** section (docs/pipeline.md), as well as beside its
 figures in the stage's section.
-5. Go back to 1.
 
 ## Every run
 
@@ -36,8 +38,17 @@ figures in the stage's section.
 - Read each result's `notes` before anything else (`get_backtest_results`). A note that the result can't be trusted
   (too few trades, halted on a limit) is part of the verdict.
 - Log every run's id.
-- Read `get_guide('backtesting')` before your first backtest and `get_guide('optimizing')` before your first sweep
-  or walk-forward.
+- **The seal.** Before your first run on a card, check its **Windows** says the hold-out is sealed on the platform.
+  A card built before the platform could seal isn't: seal it now (`seal_hold_out`, at the hold-out's start). Refused
+  (a run has already read past that date; the refusal names `earliestSealUtc`): stop, move the card to
+  `pipeline/4-validate/waiting/` and ask the owner, since its hold-out may no longer be unseen. A run refused with
+  `hold_out_sealed` reached into the hold-out: end it before the seal. Never unseal (`unseal_hold_out` gives the
+  period up for good; it is the owner's, never the desk's).
+- **Every run is a try.** The platform keeps a ledger of every run of the strategy (`list_trials`), and V5 judges the
+  strategy against all of them. Work on the card's one strategy, in revisions; a copy made with `apply_source` would
+  start a ledger of its own and hide the tries.
+- Read `get_guide('backtesting')` before your first backtest, `get_guide('optimizing')` before your first sweep
+  or walk-forward, and `get_guide('validating')` before V5 and V6.
 
 ## V1. Baseline
 
@@ -148,14 +159,47 @@ Skip it when V2 was skipped (nothing to re-optimize): say so in the card.
 Never adopt a fold's values: the V2 revision stays the one every later stage uses, and the robustness checks were run
 on it.
 
+## V5. Selection bias
+
+The best of many tries looks good by luck alone. The platform's validation report judges the strategy's run of
+record (V2's last confirmation, or V1's run when V2 changed nothing) against every try in its ledger: every backtest,
+sweep run and walk-forward run, grouped into independent tries where their daily returns move together. The
+platform reports the numbers; the thresholds are the owner's, in `validation`.
+
+1. **Write the plan into the card first:** the judged run and the thresholds below.
+2. `get_validation_report` for the judged run, its notes first. A run made before the platform kept return
+   statistics needs an identical rerun first (the report says so); an identical rerun adds no variant.
+3. **Write the figures into the card:** variants tried and independent tries (both); the deflated Sharpe ratio's
+   probability and the expected maximum Sharpe it was measured against; the strategy's return beside each traded
+   instrument's own move (buy-and-hold) and the window's long and short shares; the report's walk-forward, Monte Carlo
+   and neighbourhood readings.
+4. **Verdict:**
+   - deflated Sharpe probability below `validation.deflated_sharpe_fail`: **fail**. The result is what that many
+     tries would produce by luck more often than not;
+   - below `validation.deflated_sharpe_warn`: a **warning**;
+   - a strategy long at least `validation.long_biased_share` of the window whose return doesn't beat the move of the
+     instrument(s) it trades: a **warning** (it may be earning the market's rise, not an edge);
+   - the report reading the judged run as a spike of its sweep: a **warning**, with what you see.
+5. **Pass:** move the card to `pipeline/5-holdout/ready/`.
+
+## V6. Hold-out
+
+One run of the final revision on the hold-out the builder sealed, once. The charter's oldest rule (§4): it is never
+repeated, and a strategy that fails it is retired, never retuned.
+
+1. **Write the plan into the card's Hold-out section first:** the revision, the sealed window, the desk's account and
+   costs as for every run, tick mode (bar mode if the plan refuses tick), and the pass bar: `pass_bar` (a hedge:
+   `hedge_min_profit_factor`), its trade minimum scaled to the hold-out's length.
+2. `run_hold_out`. It previews first: confirm only when the preview names the card's strategy, its final revision and
+   the sealed window. It shows only its progress until it completes. A run that fails or is cancelled (a platform
+   error, not a result) hands the seal back: run it again; that is not a second look.
+3. Read its notes first, then the result. **Pass:** the bar above; write the figures and move the card to
+   `pipeline/6-incubation/ready/`. **Fail:** move it to `retired/` with the figures. A note that the result can't be
+   trusted (too few trades) is part of the verdict, and a warning at the least.
+
 ## Waiting
 
-A card that passes V4 waits in `pipeline/4-validate/waiting/` for the stages the platform can't run yet. Write at the
-top of its Validation section:
-
-```
-Waiting for: V5 selection-bias correction · V5 buy-and-hold comparison (long-biased) · V6 sealed hold-out
-```
-
-When the desk's playbooks gain a stage (the platform shipped its feature), resume the waiting cards oldest first,
-from the first stage they haven't run. Until then, a waiting card is never moved on.
+A stage the platform can't run (a tool missing or refusing for a reason you can't fix) stops the card in
+`pipeline/4-validate/waiting/`: write at the top of its Validation section what it waits for, and add the gap to
+`pipeline/platform-gaps.md`. Its wait is over when the platform can run that stage (the head of desk checks the gaps);
+resume it from that stage. Until then, a waiting card is never moved on.

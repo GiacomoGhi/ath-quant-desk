@@ -78,13 +78,12 @@ the result.
 | **V2. Optimization** | quant | In blocks of one or two related parameters, in an order fixed in the card before any run, once through: each block's sweep picks from a stable region by recovery factor and keeps the pick only on a clear improvement; then a cliff check one step around every tuned value | Each confirmation passes `pass_bar`; the cliff check stays profitable | runs |
 | **V3. Robustness** | quant | Costs stressed; the backtest Monte Carlo; the development window in blocks; the idea on related instruments, each at its own session (a warning, not a fail) | `robustness` | runs |
 | **V4. Walk-forward** | quant | The platform's walk-forward on the development window: the first block's grid re-optimized on rolling stretches, each pick traded on the months after it | Never fails: `walk_forward` sets its warnings | runs |
-| **V5. Selection bias** | quant | The platform's correction for the variants the idea tried; for long-biased ideas, the buy-and-hold comparison | set when the stage runs | **waits** for platform support |
-| **V6. Hold-out** | quant | One run on the hold-out window, the chosen variant only | `pass_bar` on the hold-out. Fail = retired, never retuned | **waits** (comes after V5) |
+| **V5. Selection bias** | quant | The platform's validation report on every try in the strategy's ledger: the deflated Sharpe ratio; for long-biased ideas, buy-and-hold | `validation`: fails below the luck line, warns below the confidence line; buy-and-hold warns | runs |
+| **V6. Hold-out** | quant | One run on the hold-out window the builder sealed on the platform, the chosen variant only | `pass_bar` on the hold-out. Fail = retired, never retuned | runs |
 | **P. Incubation** | portfolio manager deploys, verifier judges | Demo account, live trades against the backtest of the same days (§4a) | `incubation` | runs |
 
-A card that finishes V4 moves to `4-validate/waiting/`, its card saying which platform features it waits for. When the
-platform supports a stage, the desk's playbooks gain it and the quant resumes the waiting cards. Nothing on the desk
-stands in for a missing stage (charter §1).
+A card that needs a stage the platform can't run waits in `4-validate/waiting/`, its card saying what it waits for;
+the quant resumes it once the platform can. Nothing on the desk stands in for a missing stage (charter §1).
 
 ### 4a. Incubation
 
@@ -118,7 +117,7 @@ The desk is autonomous up to these lines:
 - **Demo is the desk's.** Agents deploy, pause and stop on demo accounts on their own (`autonomy.demo_deployments`).
 - **Real money is the owner's.** Moving anything to a real-money account is never an agent's call.
 - **Spending.** Plan changes, purchases and prop challenges are the owner's.
-- **Deleting** anything on the platform.
+- **Deleting** anything on the platform, and **unsealing** a hold-out.
 - **Sweeps and walk-forwards are the desk's** (`autonomy.sweeps`): the owner's standing yes to their run counts. The platform's limits
   are the only cap. Every run still counts toward its idea's selection-bias correction (V5).
 

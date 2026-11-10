@@ -27,8 +27,13 @@ dates, whole days, the development window ending where the hold-out begins:
 ```
 ## Windows
 - Development: 2016-11-04 → 2024-11-04
-- Hold-out:    2024-11-04 → 2026-11-04   (sealed until V6)
+- Hold-out:    2024-11-04 → 2026-11-04   (sealed on the platform until V6)
 ```
+
+**Seal it on the platform** as soon as the strategy exists, before its first run: `seal_hold_out` at the hold-out's
+start (read `get_guide('validating')` first). The platform seals only history no run has read; from then on it
+refuses any run of the strategy that reaches the seal. Refused (the refusal names `earliestSealUtc`): a run has
+already read past the date, so the hold-out isn't unseen any more; stop and ask the owner. Never unseal.
 
 From now on, every run on this strategy, by any role, stays inside the development window until V6.
 

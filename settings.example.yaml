@@ -156,6 +156,11 @@ walk_forward:                 # V4, on the development window only; a warning, n
   min_efficiency: 0.5         # below this (out-of-sample profit per year / the picks' in-sample one): a warning
   min_profitable_folds_share: 0.6  # fewer folds than this share making money out of sample: a warning
 
+validation:                   # V5: the platform's validation report (roles/quant.md); its numbers, the owner's thresholds
+  deflated_sharpe_fail: 0.5   # deflated Sharpe probability below this: more likely luck than not; retired
+  deflated_sharpe_warn: 0.95  # below this: a warning on the card
+  long_biased_share: 0.5      # long at least this share of the window: not beating buy-and-hold is a warning
+
 incubation:
   demo_account: ""            # the demo broker account incubation deploys to (its name in list_broker_accounts)
   min_trades: 20

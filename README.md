@@ -70,8 +70,8 @@ validation and portfolio work run behind it. The protocol (ids, claiming by movi
 | V2. Optimization | quant | Related parameters tuned in blocks of one or two, in an order fixed in advance: each block picks from a stable region and keeps a change only when it clearly helps; then a check that the result isn't on a cliff |
 | V3. Robustness | quant | Stressed costs, Monte Carlo, the window in blocks, related instruments |
 | V4. Walk-forward | quant | The setup re-optimized on rolling stretches, each pick traded on the months after it (a warning, never a fail) |
-| V5. Selection bias | quant | A correction for the variants the idea tried |
-| V6. Hold-out | quant | One run on the sealed window. Fail = retired |
+| V5. Selection bias | quant | The platform's validation report: is the result more than the best of many tries by luck (deflated Sharpe), and more than the market's own rise? |
+| V6. Hold-out | quant | One run on the window sealed on the platform since the build. Fail = retired |
 | P. Incubation | portfolio manager, verifier | Demo trading, matched trade by trade against the backtest of the same days |
 
 A stage the platform can't run yet waits; the desk never stands in for it. What doesn't fail a stage but matters is
