@@ -466,6 +466,12 @@
   const TOP = 98, PANEL = 212;
   let BOTTOM = 868;
   const PS = 1.3; // people are drawn a little larger than life, so they read on a phone
+  // What can be clicked: filled while drawing, front-most first (z: smaller wins; the HUD is in front of the scene).
+  let HITS = [], HOVER = null;
+  const hitRect = (kind, id, x0, y0, x1, y1, z) => HITS.push({ kind, id, x0, y0, x1, y1, z });
+  const selected = () => window.DeskInspect?.selected?.() ?? null;
+  const isOn = (h, kind, id) => h && h.kind === kind && h.id === id;
+  const lit = (kind, id) => isOn(HOVER, kind, id) || isOn(selected(), kind, id);
 
   function resize() {
     const dpr = window.devicePixelRatio || 1;
@@ -542,8 +548,15 @@
   }
 
   function drawFloorEffects(g, s) {
+    for (const [name, r] of Object.entries(ROOMS)) {
+      const z0 = r.row === 0 ? 14 : 120, z1 = r.row === 0 ? 100 : 206;
+      const poly = [[r.x, 0, z0], [r.x + r.w, 0, z0], [r.x + r.w, 0, z1], [r.x, 0, z1]].map((q) => D3.P(...q));
+      HITS.push({ kind: 'room', id: name, poly, z: Infinity });
+      if (lit('room', name)) { g.save(); g.shadowColor = r.accent; g.shadowBlur = 24 * U; D3.poly(g, [[r.x + 1, 0.06, z0 + 1], [r.x + r.w - 1, 0.06, z0 + 1], [r.x + r.w - 1, 0.06, z1 - 1], [r.x + 1, 0.06, z1 - 1]], D3.alpha(r.accent, 0.1), r.accent, 2.5 * U); g.restore(); }
+    }
     for (const a of s.actors.values()) {
       const c = roleColor(a.role);
+      if (lit('actor', a.key)) { g.save(); g.shadowColor = '#ffffff'; g.shadowBlur = 18 * U; D3.floorEllipse(g, a.x, a.y, 7.5, null, '#ffffff', 2.5 * U, 0.06); g.restore(); }
       D3.floorEllipse(g, a.x, a.y, 5.4, 'rgba(0,0,0,0.45)');
       g.save(); g.shadowColor = c; g.shadowBlur = 10 * U;
       D3.floorEllipse(g, a.x, a.y, 5, D3.alpha(c, 0.12), D3.alpha(c, 0.85), 1.4 * U, 0.05);
@@ -589,7 +602,12 @@
     const list = FLOOR.items.map((it) => ({ d: D3.depth(...it.ref), draw: it.draw }));
     for (const c of s.cards.values()) if (!c.gone && !c.heldBy && c.loc) {
       const w = cardWorld(c);
-      list.push({ d: D3.depth(w.x, 0, w.z + 6), draw: (gg) => { const p = D3.P(w.x, w.y, w.z); A.drawCard(gg, p.x, p.y, p.k, c.color); } });
+      list.push({ d: D3.depth(w.x, 0, w.z + 6), draw: (gg) => {
+        const p = D3.P(w.x, w.y, w.z);
+        A.drawCard(gg, p.x, p.y, p.k, c.color, lit('card', c.id) ? 2.4 : 1);
+        if (lit('card', c.id)) { gg.strokeStyle = '#ffffff'; gg.lineWidth = 2 * U; gg.strokeRect(p.x - 3.4 * p.k, p.y - 8 * p.k, 6.8 * p.k, 9 * p.k); }
+        hitRect('card', c.id, p.x - 2.8 * p.k, p.y - 7 * p.k, p.x + 2.8 * p.k, p.y + 0.5 * p.k, p.z - 2);
+      } });
     }
     for (const a of s.actors.values()) list.push({ d: D3.depth(a.x, 0, a.y), draw: (gg) => drawActor(gg, s, a) });
     for (const e of s.effects) if (e.type !== 'ring') list.push({ d: D3.depth(e.x, 0, e.z + 8), draw: (gg) => drawEffect(gg, s, e) });
@@ -597,9 +615,14 @@
     for (const it of list) it.draw(g, s);
   }
   function drawActor(g, s, a) {
-    const p = D3.P(a.x, 0, a.y);
-    A.drawPerson(g, a.role, a.seat, a.pose, a.ft, p.x, p.y, p.k * PS, a.facing);
-    if (a.held) A.drawCard(g, p.x + A.HAND.x * PS * p.k * a.facing, p.y - (A.HAND.y - 4.6) * PS * p.k, p.k * 1.15, a.held.color, 1.6);
+    const p = D3.P(a.x, 0, a.y), k = p.k * PS;
+    A.drawPerson(g, a.role, a.seat, a.pose, a.ft, p.x, p.y, k, a.facing);
+    hitRect('actor', a.key, p.x - 5 * k, p.y - 21 * k, p.x + 5 * k, p.y + 2 * k, p.z);
+    if (a.held) {
+      const cx = p.x + A.HAND.x * k * a.facing, cy = p.y - (A.HAND.y - 4.6) * k, ck = p.k * 1.15;
+      A.drawCard(g, cx, cy, ck, a.held.color, 1.6);
+      hitRect('card', a.held.id, cx - 2.6 * ck, cy - 6.8 * ck, cx + 2.6 * ck, cy, p.z - 1);
+    }
   }
 
   function rrect(g, x, y, w, h, r) { A.rr(g, x, y, w, h, r); }
@@ -629,7 +652,8 @@
     g.font = font(11.5, 700); spacing(g, 1.2);
     for (const a of s.actors.values()) {
       const p = D3.P(a.x, 0, a.y + 5.5), name = nameOf(a), tw = g.measureText(name).width, c = tagColor(a.role);
-      pill(g, p.x - tw / 2 - 8 * U, p.y - 9 * U, tw + 16 * U, 18 * U, 'rgba(6,9,18,0.82)', D3.alpha(c.startsWith('#') ? c : '#e8ecf7', 0.5), U);
+      pill(g, p.x - tw / 2 - 8 * U, p.y - 9 * U, tw + 16 * U, 18 * U, 'rgba(6,9,18,0.82)', lit('actor', a.key) ? '#ffffff' : D3.alpha(c.startsWith('#') ? c : '#e8ecf7', 0.5), U);
+      hitRect('actor', a.key, p.x - tw / 2 - 8 * U, p.y - 9 * U, p.x + tw / 2 + 8 * U, p.y + 9 * U, -1);
       g.fillStyle = c; g.fillText(name, p.x - tw / 2 + 0.6 * U, p.y + 0.5 * U);
     }
     g.font = font(12.5, 700, MONO); spacing(g, 0);
@@ -676,6 +700,7 @@
       }
       by = Math.max((TOP + 8) * U, by);
       placed.push({ x: bx, y: by, w: bw, h: bh });
+      hitRect('actor', a.key, bx, by, bx + bw, by + bh, -2);
       const lift = (1 - al) * 8 * U;
       g.save(); g.globalAlpha = al; g.translate(0, lift);
       // the leader line from the panel to the speaker
@@ -728,7 +753,8 @@
         for (const c of chips) {
           if (x > CW) break;
           if (x + c.w > 0) {
-            g.font = font(15, 700, MONO); spacing(g, 0); g.fillStyle = c.moving ? '#ffffff' : '#dfe5f2'; g.fillText(c.id, x, mid);
+            g.font = font(15, 700, MONO); spacing(g, 0); g.fillStyle = c.moving || lit('card', c.id) ? '#ffffff' : '#dfe5f2'; g.fillText(c.id, x, mid);
+            hitRect('card', c.id, x - 6 * U, y0, x + c.w - 30 * U, y0 + h, -10);
             g.font = font(13, 700); spacing(g, 1.5); g.fillStyle = '#8b93a8'; g.fillText(c.stage, x + idW + 12 * U, mid);
             spacing(g, 0); g.font = font(14, 800, BODY); g.fillStyle = c.mark[1];
             g.fillText(c.mark[0], x + idW + 12 * U + g.measureText(c.stage).width + 14 * U, mid);
@@ -785,7 +811,16 @@
     const mode = LIVE ? '● LIVE' : `REPLAY${speed !== 1 ? ' ×' + speed : ''}${paused ? ' · PAUSED' : ''}`;
     g.font = font(12, 700); spacing(g, 2.5);
     g.fillStyle = LIVE ? (Math.floor(performance.now() / 600) % 2 ? '#ff4d6d' : '#a33') : '#8b93a8';
-    g.fillText(mode, bx - 18 * U - g.measureText(mode).width, 32.5 * U);
+    const mw = g.measureText(mode).width;
+    g.fillText(mode, bx - 18 * U - mw, 32.5 * U);
+    if (!params.has('clean')) {
+      const lab = 'LIBRARY', lw = g.measureText(lab).width + 46 * U, lx = bx - 40 * U - mw - lw;
+      pill(g, lx, 17 * U, lw, 30 * U, lit('library', 'all') ? 'rgba(111,168,255,0.25)' : 'rgba(111,168,255,0.08)', D3.alpha('#6fa8ff', 0.6), 1.2 * U);
+      g.fillStyle = '#cfe0ff'; g.fillText(lab, lx + 30 * U, 32.5 * U);
+      g.strokeStyle = '#cfe0ff'; g.lineWidth = 1.6 * U;
+      for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(lx + 13 * U, (26 + i * 6) * U); g.lineTo(lx + 23 * U, (26 + i * 6) * U); g.stroke(); }
+      hitRect('library', 'all', lx, 17 * U, lx + lw, 47 * U, -20);
+    }
     spacing(g, 0);
   }
 
@@ -821,6 +856,7 @@
       g.fillText((e.seat > 1 ? `${e.role} ${e.seat}` : e.role).toUpperCase(), x + 16 * U, y); spacing(g, 0);
       x += 236 * U;
       if (e.card) { g.font = font(16, 700, MONO); g.fillStyle = '#ffffff'; g.fillText(e.card, x, y); }
+      hitRect(e.card ? 'card' : 'actor', e.card ?? `${e.role === 'owner' ? 'head of desk' : e.role}#${e.role === 'owner' ? 1 : e.seat}`, 20 * U, y - 22 * U, (showK ? kx - 30 : CW / U - 20) * U, y + 9 * U, -10);
       x += 96 * U;
       g.font = font(18, 500, BODY); g.fillStyle = '#cdd4e6';
       const [line] = wrap(g, e.n > 1 ? `${e.text}  ×${e.n}` : e.text, (showK ? kx - 42 : CW / U - 28) * U - x, 1);
@@ -872,6 +908,7 @@
     const g = ctx, s = S;
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.textAlign = 'left';
+    HITS = [];
     drawScene(g, s);
     D3.bloom(g, 0.55);
     vignette(g);
@@ -889,7 +926,7 @@
     if (showHelp) {
       g.font = font(11, 600); spacing(g, 1.5); g.textBaseline = 'alphabetic';
       g.fillStyle = 'rgba(200,210,235,0.45)';
-      const help = LIVE ? 'H HIDE HELP' : 'SPACE PAUSE · R RESTART · 1-4 SPEED · H HIDE HELP';
+      const help = LIVE ? 'CLICK ANYTHING TO OPEN IT · B LIBRARY · H HIDE HELP' : 'CLICK ANYTHING TO OPEN IT · B LIBRARY · SPACE PAUSE · R RESTART · 1-4 SPEED · H HIDE HELP';
       g.fillText(help, CW - g.measureText(help).width - 22 * U, (BOTTOM - 12) * U);
       spacing(g, 0);
     }
@@ -909,7 +946,28 @@
     requestAnimationFrame(frame);
   }
   function seek(p) { S = newState(); acc = 0; while (S.sim < p) update(S, STEP); render(); return S.sim; }
+  // pointing and clicking: the front-most thing under the pointer opens in the side panel (inspect.js)
+  function hitAt(e) {
+    const r = canvas.getBoundingClientRect(), x = (e.clientX - r.left) * (CW / r.width), y = (e.clientY - r.top) * (CH / r.height);
+    let best = null;
+    for (const h of HITS) {
+      const inside = h.poly ? inPoly(x, y, h.poly) : x >= h.x0 && x <= h.x1 && y >= h.y0 && y <= h.y1;
+      if (inside && (!best || h.z < best.z)) best = h;
+    }
+    return best && { kind: best.kind, id: best.id };
+  }
+  function inPoly(x, y, p) {
+    let c = false;
+    for (let i = 0, j = p.length - 1; i < p.length; j = i++) if ((p[i].y > y) !== (p[j].y > y) && x < ((p[j].x - p[i].x) * (y - p[i].y)) / (p[j].y - p[i].y) + p[i].x) c = !c;
+    return c;
+  }
+  canvas.addEventListener('mousemove', (e) => { HOVER = hitAt(e); canvas.style.cursor = HOVER ? 'pointer' : 'default'; });
+  canvas.addEventListener('mouseleave', () => { HOVER = null; });
+  canvas.addEventListener('click', (e) => { const h = hitAt(e); if (h) window.DeskInspect?.open(h); });
   addEventListener('keydown', (e) => {
+    if (e.target instanceof HTMLElement && e.target.closest('input, textarea')) return; // typing in the panel's search
+    if (e.key === 'Escape') { window.DeskInspect?.close(); return; }
+    if (e.key === 'b' || e.key === 'B') { window.DeskInspect?.open({ kind: 'library', id: 'all' }); return; }
     if (e.key === ' ') { paused = !paused; e.preventDefault(); }
     else if (e.key === 'r' || e.key === 'R') { if (!LIVE) seek(0); }
     else if (e.key === 'h' || e.key === 'H') showHelp = !showHelp;
@@ -931,7 +989,7 @@
     if (LIVE) {
       const es = new EventSource('/api/live');
       es.addEventListener('snapshot', (m) => { const snap = JSON.parse(m.data); start({ mode: snap.mode, cards: snap.cards, events: [], newcomers: [] }); });
-      es.addEventListener('desk', (m) => { if (S) handle(S, JSON.parse(m.data)); });
+      es.addEventListener('desk', (m) => { if (!S) return; const ev = JSON.parse(m.data); TL.events.push(ev); handle(S, ev); }); // kept, so the panel can list the day so far
       es.onerror = () => { if (!S) errorText = 'Live mode needs the server: node viz/server.mjs, then open /?live'; };
       return;
     }
@@ -952,7 +1010,11 @@
 
   // step(seconds) advances the simulation deterministically (for screenshots and tests, with the page paused)
   const step = (sec) => { const end = S.sim + sec; while (S.sim < end - 1e-9) update(S, STEP); render(); return S.sim; };
-  window.DeskViz = { seek, step, get state() { return S; }, get timeline() { return TL; }, get acts() { return ACTS; }, get plan() { return PLAN; }, pause: (v = true) => { paused = v; } };
+  window.DeskViz = { seek, step, get state() { return S; }, get timeline() { return TL; }, get acts() { return ACTS; }, get plan() { return PLAN; }, pause: (v = true) => { paused = v; },
+    // for the side panel (inspect.js)
+    headerCss: () => (64 * U) / (window.devicePixelRatio || 1), // the header's height in CSS px: the panel opens below it, so the badge stays visible
+    live: LIVE, rooms: ROOMS, stageRoom: STAGE_ROOM, roleRoom: ROLE_ROOM, roleColor, served: location.protocol.startsWith('http'),
+    hits: () => HITS.map(({ kind, id, x0, y0, x1, y1, z }) => ({ kind, id, x0, y0, x1, y1, z })) }; // (for tests)
   load();
   requestAnimationFrame(frame);
 })();

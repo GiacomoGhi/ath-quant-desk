@@ -2,14 +2,16 @@
 // The visual desk's small server: no dependencies, Node 22.
 //   node viz/server.mjs [--port 8787] [--pipeline <folder>] [--private]
 // Serves the page, the replay timeline (GET /api/timeline?date=YYYY-MM-DD or ?from=…&to=…) and LIVE events
-// (GET /api/live, Server-Sent Events) by watching the pipeline folder. The privacy mode is the server's, fixed at
-// start: PUBLIC unless --private. A public server redacts every event before it leaves this process, and serves only
-// the page's own files (never viz/out/, where a private export may sit).
+// (GET /api/live, Server-Sent Events) by watching the pipeline folder, and what a viewer can open (GET /api/library,
+// GET /api/doc?key=…). The privacy mode is the server's, fixed at start: PUBLIC unless --private. A public server
+// redacts every event before it leaves this process, serves the desk's own documents but none of the pipeline's
+// (no lead, card, log or report), and serves only the page's own files (never viz/out/, where a private export may sit).
 
 import { createServer } from 'node:http';
 import { readFileSync, watch } from 'node:fs';
 import { join } from 'node:path';
 import { buildTimeline, snapshot, eventKeys } from './lib/pipeline.mjs';
+import { library, readDoc } from './lib/library.mjs';
 import { args, pipelineDir, vizDir } from './lib/args.mjs';
 
 const a = args();
@@ -18,7 +20,7 @@ const mode = a.private ? 'private' : 'public';
 const port = Number(a.port ?? 8787);
 const host = a.host ?? '127.0.0.1';
 
-const FILES = { '/': 'index.html', '/index.html': 'index.html', '/desk.js': 'desk.js', '/engine.js': 'engine.js', '/people.js': 'people.js', '/floor.js': 'floor.js' };
+const FILES = { '/': 'index.html', '/index.html': 'index.html', '/desk.js': 'desk.js', '/engine.js': 'engine.js', '/people.js': 'people.js', '/floor.js': 'floor.js', '/inspect.js': 'inspect.js' };
 const TYPES = { html: 'text/html; charset=utf-8', js: 'text/javascript; charset=utf-8' };
 
 const clients = new Set();
@@ -52,6 +54,18 @@ createServer((req, res) => {
       if (![from, to].every((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))) { res.writeHead(400).end('bad date'); return; }
       res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' });
       res.end(JSON.stringify(buildTimeline(root, { from, to, mode })));
+      return;
+    }
+    if (url.pathname === '/api/library') {
+      res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' });
+      res.end(JSON.stringify(library(root, join(vizDir, '..'), mode)));
+      return;
+    }
+    if (url.pathname === '/api/doc') {
+      const doc = readDoc(root, join(vizDir, '..'), mode, url.searchParams.get('key') ?? '');
+      if (!doc) { res.writeHead(mode === 'private' ? 404 : 403).end(mode === 'private' ? 'not found' : 'private'); return; }
+      res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' });
+      res.end(JSON.stringify(doc));
       return;
     }
     if (url.pathname === '/api/live') {

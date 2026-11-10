@@ -120,7 +120,15 @@ code (no images), and the screens on the walls are decoration that never shows t
 - **Replay a day** (about 90 s, deterministic, made to screen-record): `node viz/server.mjs`, then open
   `http://127.0.0.1:8787/?date=YYYY-MM-DD`. `&duration=120` sets the length; `?from=…&to=…` replays a range.
   Keys: space pause, R restart, 1-4 speed, H hide the help line.
-- **Without a server**: `node viz/build-timeline.mjs --date YYYY-MM-DD`, then open `viz/index.html`.
+- **Click to look inside.** Click a character, a card, a room, a ticker chip or a feed line (or press B for the
+  library) to open a side panel: what a character is doing now and has done today, where a card stands and its day,
+  what each room's stage does and which cards are in it, every idea grouped by stage, and the desk's rules and
+  playbooks. A server started with `--private` also opens each idea's lead (the paper it comes from), its card (rules,
+  each stage's plan and result) and its log, plus the sources screened, the notions, the research focus, the platform
+  gaps and the weekly reports. A public server sends none of those: the page asks for documents by name from a fixed
+  list, and the server refuses every private one.
+- **Without a server**: `node viz/build-timeline.mjs --date YYYY-MM-DD`, then open `viz/index.html` (the side panel
+  then shows only what the replay holds).
 - **Live**: with the server running, open `http://127.0.0.1:8787/?live`. It watches `pipeline/` and streams new log
   lines as they are written.
 - **Public by default.** Everything is PUBLIC unless started with `--private`: the page then gets only role names, card

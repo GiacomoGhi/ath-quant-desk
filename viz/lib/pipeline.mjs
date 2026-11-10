@@ -43,7 +43,7 @@ function safeRead(file) { try { return readFileSync(file, 'utf8'); } catch { ret
 function isDir(p) { try { return statSync(p).isDirectory(); } catch { return false; } }
 
 // Every card folder (Q-/P-/F-NNNN-slug) wherever it sits, with its current location.
-function findCards(root) {
+export function findCards(root) {
   const cards = [];
   const visit = (rel, depth) => {
     for (const name of safeList(join(root, rel))) {
@@ -58,7 +58,7 @@ function findCards(root) {
   return cards;
 }
 
-function readTitle(dir, id) {
+export function readTitle(dir, id) {
   for (const file of ['card.md', 'lead.md']) {
     const text = safeRead(join(dir, file));
     if (!text) continue;
