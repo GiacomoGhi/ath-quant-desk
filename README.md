@@ -134,3 +134,7 @@ code (no images), and the screens on the walls are decoration that never shows t
   minutes. Each session's lines keep their own spacing and are shifted just enough to fall in log order; a time that
   was estimated or corrected shows as `~15:21`. Bursts of routine lines are acted as one action, characters overlap,
   and a busy day plays at a faster pace to fit the length.
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).
