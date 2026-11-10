@@ -8,8 +8,8 @@ speaks MCP); AlgoTradingHub does all the building, backtesting, optimizing, vali
 public MCP server.
 
 This repository holds no trading engine. It is the desk's definition: the roles, their playbooks, the folder protocol
-they work through, and the rules every idea has to pass. It is plain Markdown, plus an optional visual replay of the
-desk at work ([`viz/`](viz/)).
+they work through, and the rules every idea has to pass. It is plain Markdown, plus an optional visual view of the
+desk at work, as a replay of a day or live as the agents work ([`viz/`](viz/)).
 
 Status: early. The playbooks are tightened as the desk runs and learns.
 
@@ -110,9 +110,10 @@ pipeline/               your work: created by the desk, never committed
 
 ## Visual desk
 
-[`viz/`](viz/) replays a day on the desk as a 3D night-time trading floor: each role is a character, each stage a
-glass-walled room, and each card a glowing tile carried between rooms as its log lines happen. A slow camera drifts
-over the floor, the sky follows the replay's clock, and a ticker tape shows where every card is. Everything is drawn in
+[`viz/`](viz/) shows the desk at work as a 3D night-time trading floor, either replaying a day or live as the agents
+work: each role is a character, each stage a glass-walled room, and each card a glowing tile carried between rooms as
+its log lines happen. A slow camera drifts over the floor, the sky follows the clock, and a ticker tape shows where
+every card is. Everything is drawn in
 code (no images), and the screens on the walls are decoration that never shows the desk's numbers. It only reads
 `pipeline/`. Node 22, no dependencies, no build step.
 
