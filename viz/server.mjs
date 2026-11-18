@@ -20,8 +20,8 @@ const mode = a.private ? 'private' : 'public';
 const port = Number(a.port ?? 8787);
 const host = a.host ?? '127.0.0.1';
 
-const FILES = { '/': 'index.html', '/index.html': 'index.html', '/desk.js': 'desk.js', '/engine.js': 'engine.js', '/people.js': 'people.js', '/floor.js': 'floor.js', '/inspect.js': 'inspect.js' };
-const TYPES = { html: 'text/html; charset=utf-8', js: 'text/javascript; charset=utf-8' };
+const FILES = { '/': 'index.html', '/index.html': 'index.html', '/desk.css': 'desk.css', '/desk.js': 'desk.js', '/inspect.js': 'inspect.js' };
+const TYPES = { html: 'text/html; charset=utf-8', css: 'text/css; charset=utf-8', js: 'text/javascript; charset=utf-8' };
 
 const clients = new Set();
 let known = new Set(eventKeys(root, mode).map((k) => k.key));

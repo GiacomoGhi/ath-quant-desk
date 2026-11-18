@@ -112,20 +112,21 @@ pipeline/               your work: created by the desk, never committed
 
 ## Visual desk
 
-[`viz/`](viz/) shows the desk at work as a 3D night-time trading floor, either replaying a day or live as the agents
-work: each role is a character, each stage a glass-walled room, and each card a glowing tile carried between rooms as
-its log lines happen. A slow camera drifts over the floor, the sky follows the clock, and a ticker tape shows where
-every card is. Everything is drawn in
-code (no images), and the screens on the walls are decoration that never shows the desk's numbers. It only reads
-`pipeline/`. Node 22, no dependencies, no build step.
+[`viz/`](viz/) shows the desk at work as one plain screen, in the manner of a terminal tool, either replaying a day
+or live as the agents work. The top half is the pipeline as a board: one column per stage, one row per card, and a card
+travels from column to column as its log lines happen. Below it, the seats (each role, what it is doing now and on
+which card) and the activity log, line by line. The status line counts the day: new leads, passed on, sent back,
+retired, parked. It only reads `pipeline/`. Node 22, no dependencies, no build step.
 
 - **Replay a day** (about 90 s, deterministic, made to screen-record): `node viz/server.mjs`, then open
   `http://127.0.0.1:8787/?date=YYYY-MM-DD`. `&duration=120` sets the length; `?from=…&to=…` replays a range.
-  Keys: space pause, R restart, 1-4 speed, H hide the help line.
-- **Click to look inside.** Click a character, a card, a room, a ticker chip or a feed line (or press B for the
-  library) to open a side panel: what a character is doing now and has done today, where a card stands and its day,
-  what each room's stage does and which cards are in it, every idea grouped by stage, and the desk's rules and
-  playbooks. A server started with `--private` also opens each idea's lead (the paper it comes from), its card (rules,
+  Keys: space pause, R restart, 1-4 speed, H hide the help line; click or drag the line under the header to move
+  through the day. `&t=40&pause` opens the replay stopped at a moment, `&open=card:Q-0001` with a panel open, and
+  `&clean` hides the controls for a recording.
+- **Click to look inside.** Click a card, a seat, a column's heading, a line of the log or the log's heading (or press
+  B for the library) to open a side panel: what a seat is doing now and has done today, where a card stands and its
+  day, what each stage does and which cards are in it, the whole day so far, every idea grouped by stage, and the
+  desk's rules and playbooks. A server started with `--private` also opens each idea's lead (the paper it comes from), its card (rules,
   each stage's plan and result) and its log, plus the sources screened, the notions, the research focus, the platform
   gaps and the weekly reports. A public server sends none of those: the page asks for documents by name from a fixed
   list, and the server refuses every private one.
@@ -143,8 +144,8 @@ code (no images), and the screens on the walls are decoration that never shows t
   `--pipeline <folder>` (or `ATH_DESK_PIPELINE`) points any of the scripts elsewhere.
 - **How a day is timed**: each agent session stamps lines with its own clock, and those clocks can disagree by many
   minutes. Each session's lines keep their own spacing and are shifted just enough to fall in log order; a time that
-  was estimated or corrected shows as `~15:21`. Bursts of routine lines are acted as one action, characters overlap,
-  and a busy day plays at a faster pace to fit the length.
+  was estimated or corrected shows as `~15:21`. Bursts of routine lines are shown as one line, seats work at the same
+  time, and a busy day plays at a faster pace to fit the length.
 
 ## License
 

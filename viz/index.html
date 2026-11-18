@@ -5,14 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Visual Desk</title>
   <link rel="icon" href="data:,">
-  <style>
-    html, body { margin: 0; height: 100%; background: #0d0e16; overflow: hidden; }
-    body { display: flex; align-items: center; justify-content: center; }
-    canvas { display: block; image-rendering: pixelated; }
-  </style>
+  <link rel="stylesheet" href="desk.css">
 </head>
 <body>
-  <canvas id="desk"></canvas>
+  <div id="app">
+    <header id="top">
+      <div class="brand"><i class="mark"></i><b>ATH Quant Desk</b><span>AI-run systematic trading desk</span></div>
+      <div class="clock"><b id="clock">--:--</b><span>UTC</span><span id="date"></span></div>
+      <div class="tools">
+        <span id="transport">
+          <button class="btn" id="play" title="Space">pause</button>
+          <button class="btn" id="speed" title="Keys 1 to 4">1×</button>
+          <button class="btn" id="restart" title="R">restart</button>
+        </span>
+        <span id="mode"></span>
+        <button class="btn" id="lib" data-open="library:all" title="B">library</button>
+        <span id="badge"></span>
+      </div>
+      <div id="progress" title="Click or drag to move through the day"><i></i></div>
+    </header>
+    <main>
+      <section class="box" id="board"><h2>Pipeline</h2><span class="meta" id="board-meta"></span><div id="cols"></div></section>
+      <div id="lower">
+        <section class="box" id="seats"><h2>Seats</h2><span class="meta" id="seats-meta"></span><div class="rows" id="seat-rows"></div></section>
+        <section class="box" id="feed"><h2>Activity</h2><button class="meta" id="feed-meta" data-open="day:all"></button><div class="rows" id="feed-rows"></div></section>
+      </div>
+    </main>
+    <footer id="status"><div id="counts"></div><div id="help"></div></footer>
+  </div>
+  <div id="fly"></div>
+  <div id="curtain"></div>
+  <div id="notice"></div>
   <!-- From file://, the replay comes from viz/out/timeline.js (node viz/build-timeline.mjs), or ?file=private for
        viz/out/private.js. Served by node viz/server.mjs, it comes from /api/timeline or /api/live instead. -->
   <script>
@@ -21,9 +44,6 @@
       document.write('<script src="out/' + name + '.js"><' + '/script>');
     }
   </script>
-  <script src="engine.js"></script>
-  <script src="people.js"></script>
-  <script src="floor.js"></script>
   <script src="desk.js"></script>
   <script src="inspect.js"></script>
 </body>
