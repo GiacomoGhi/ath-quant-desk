@@ -78,6 +78,7 @@ Keep it as a lead only if all of these hold:
 - **Costs don't kill it:** estimate the gross edge per trade from the source against the round trip on the desk's
   broker (spread and commission on both fills, the settings' slippage) and, for holds over several nights, the swap.
   The analyst retires an idea below `research.min_edge_to_cost` times that, so drop it now when it is clearly under.
+  When the setting is 0 there is no such bar: note the costs in the lead and leave them to the backtests.
   Intraday edges on CFDs rarely clear it; holds of one to five days usually fit best.
 
 Prefer peer-reviewed and widely replicated work; then working papers with data and method; then practitioner research.

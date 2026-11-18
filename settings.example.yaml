@@ -128,7 +128,8 @@ sizing:
   default_risk_percent: 0.5   # the desk default when an idea's source doesn't size: risk per trade, at the stop
 
 research:
-  min_edge_to_cost: 3         # the average move captured per trade must be at least this many round-trip costs
+  min_edge_to_cost: 3         # the average move captured per trade must be at least this many round-trip costs;
+                              # 0 = no cost bar before a backtest: the analyst records the costs, V1 and V3 judge them
 
 optimization:                 # V2: the card's parameters tuned in blocks, once through (roles/quant.md)
   max_parameters_per_block: 2 # related parameters swept together; never more

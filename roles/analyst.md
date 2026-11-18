@@ -101,7 +101,9 @@ parameter defaults, departures from the source) is made from the source and from
     run (the platform keeps no history of swap rates), so in years of near-zero rates it overstates financing; say so
     when financing decides the verdict.
 
-  Below `research.min_edge_to_cost` times that total, the idea is cost-fragile. A basket is judged on its average
+  Below `research.min_edge_to_cost` times that total, the idea is cost-fragile. **When the setting is 0 the bar is
+  off:** write the round trip and the financing in the card for the record, make no estimate of the edge and no
+  verdict on costs; the backtests judge them (V1 at the owner's costs, V3 stressed). A basket is judged on its average
   trade, weighted as its sizing weights the instruments; list every instrument's own ratio in the card, so a later
   stage can see which ones carry it. An instrument that neither `costs.broker_preset` nor any of
   `costs.fallback_presets` covers is **not testable**: leave it out of the card and say so (a broker without a preset
@@ -124,8 +126,8 @@ catches when it pays.
 
 Pass the card to `pipeline/2-build/ready/` only if every box in its **Gate R** section is ticked. Otherwise:
 
-- **Retire it** (`retired/`) when the idea fails on its own terms: no rationale, too few trades, cost-fragile, a
-  duplicate, a source whose evidence doesn't hold up.
+- **Retire it** (`retired/`) when the idea fails on its own terms: no rationale, too few trades, cost-fragile (when
+  the bar is on), a duplicate, a source whose evidence doesn't hold up.
 - **Park it** (`parked/`) when it is sound but the platform can't express a rule yet. Add the missing capability to
   `pipeline/platform-gaps.md`: `2026-11-04 · Q-0012 · <what the strategy needs that the platform can't do>`. Don't
   simplify the idea until it fits; a simplified idea is a different idea, and needs its own rationale and its own card.

@@ -26,7 +26,8 @@ Every design is written before anyone sees a result.
   that must happen (a hedge rebalanced, a session's forced closes), a constraint (a margin call, a risk limit), a
   behaviour with a cause. Cite the notions you build on; the parts that are yours are said to be yours.
 - **Build for the account.** Hold long enough for the move to clear costs several times over
-  (`research.min_edge_to_cost`), short enough to give a few hundred trades in the development window, flat when the
+  (`research.min_edge_to_cost`; when it is 0 there is no cost bar, but a move that barely clears the round trip
+  still won't survive V1), short enough to give a few hundred trades in the development window, flat when the
   goal's rules say so. Prefer both directions, or the side the book lacks.
 - **Few parameters,** each with a reason for its default. Which to tune, and in which blocks, is the analyst's
   optimization plan (roles/analyst.md); a design that needs many knobs to work is not one mechanism.
@@ -35,8 +36,8 @@ Every design is written before anyone sees a result.
   that reverses on the days the design picks); the trades clustered into too few independent events; the move
   captured was a small multiple of the round trip. Before writing a lead, find the evidence for the direction in
   your exact conditions (not the average), count the independent episodes your window can hold (a handful of
-  crises is not a sample), and work the cost on the desk copy at the window's own prices. A design that fails one
-  of these is not written; its lesson goes in `notions.md`.
+  crises is not a sample), and work the cost on the desk copy at the window's own prices (skipped when
+  `research.min_edge_to_cost` is 0). A design that fails one of these is not written; its lesson goes in `notions.md`.
 - **Say what would prove it wrong:** the trade count, the market conditions it should earn in, and how often its
   conditions should fire (the trigger rate), so the verifier and the quant can check the design against itself.
 - **A design drawn from a retired card's results** (an idea built because a run showed something) is a variant of

@@ -86,7 +86,7 @@ decided without looking at any results>
 - [ ] Every rule can be written in the strategy text
 - [ ] Not a duplicate of a card in any stage, `parked/` or `retired/`
 - [ ] Expected trades meet the settings' minimum
-- [ ] The edge per trade clears the costs
+- [ ] The edge per trade clears the costs (or `research.min_edge_to_cost` is 0: costs recorded, judged by V1 and V3)
 - [ ] The optimization plan: blocks of related parameters (at most two each), ordered by the mechanism, each grid
       within the run limit
 
