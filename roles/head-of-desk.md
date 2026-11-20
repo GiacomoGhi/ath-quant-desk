@@ -33,6 +33,10 @@ cards, build, test or deploy. Your one kind of run is bringing the owner's portf
   strategy is long US indices for days is one strategy.
 - **The portfolio manager's needs.** What would lower the running portfolios' correlation or margin.
 - **Retirements.** Themes whose ideas keep dying at the same stage, and why: steer away, or ask for better sources.
+  **Close a family** (the selection-bias families the cards name) once two or more of its cards have failed V1 and
+  none has passed it: list it under **Closed families** in `focus.md`, with the cards and their figures. No new lead
+  is written or carded in a closed family unless a source brings tier-A evidence (templates/lead.md); reopen it then,
+  or when a platform change gives the family something it lacked.
 
 - **The owner's goal** (`owner.goal`), when set: what the book is for (a prop challenge's rules, an account size, a
   currency). Every focus serves it: a lead that can't help that account is not worth the analyst's time.
@@ -55,7 +59,8 @@ cards, build, test or deploy. Your one kind of run is bringing the owner's portf
     of a desk copy: `update_portfolio`, each slot keeping its strategy, revision and sizing, its backtest replaced by
     the re-run. Then compare the recent weeks with the analysis before: what the new stretch added to the drawdown,
     and which slots made or lost it.
-- **The leads waiting.** Rank the leads in `pipeline/1-research/ready/` by how much each would fill the gaps above,
+- **The leads waiting.** Rank the leads in `pipeline/1-research/ready/` by **evidence tier** first (A, B, C, D:
+  templates/lead.md), then, within a tier, by how much each would fill the gaps above,
   for the analyst to take in that order. A lead that adds to the crowded side goes last, not out: the analyst still
   judges it.
 

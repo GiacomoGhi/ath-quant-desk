@@ -13,6 +13,10 @@ only run that ever reads it is V6's.
    the first stage it hasn't run; else the oldest in `pipeline/4-validate/ready/`.
 3. Run **V1**, **V2**, **V3**, **V4**, then **V5**. Before each stage, write its plan and pass criteria into the card's
    **Validation** section; then run; then write the result and the verdict.
+   **Verification comes in two passes** (roles/verifier.md). A card whose Verify section records only pass 1 stops
+   after a **V1 pass**: write "V1 passed, pass 2 due" in its Verify section and move it to `pipeline/3-verify/ready/`.
+   When it comes back conforming, go on from V2. If pass 2 found a defect and the builder made a new revision, run V1
+   again on that revision (a new try in the ledger), then V2.
 4. **Fail** at any stage: move the card to `retired/` with the stage and the figures that failed.
 5. **Pass V5:** move the card to `pipeline/5-holdout/ready/`.
 6. Go back to 1.

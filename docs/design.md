@@ -73,7 +73,7 @@ the result.
 |---|---|---|---|---|
 | **R. Idea** | analyst | The card: hypothesis, rationale, rules, parameters, costs and frequency checks | Gate R in the card | runs |
 | **B. Build** | builder | The strategy written as the card says; windows fixed; one smoke run | The platform validates it and it trades | runs |
-| **C. Verify** | verifier | Trades checked against the card's rules and the prices | Every rule fires as written | runs |
+| **C. Verify** | verifier | Trades checked against the card's rules and the prices, in two passes: the core rules before V1; the full calendar audit (holidays, early closes, contract rolls, data stops) only after a V1 pass, before V2 | Every rule fires as written | runs |
 | **V1. Baseline** | quant | Default parameters, development window, the owner's broker costs | `pass_bar` | runs |
 | **V2. Optimization** | quant | In blocks of one or two related parameters, in an order fixed in the card before any run, once through: each block's sweep picks from a stable region by recovery factor and keeps the pick only on a clear improvement; then a cliff check one step around every tuned value | Each confirmation passes `pass_bar`; the cliff check stays profitable | runs |
 | **V3. Robustness** | quant | Costs stressed; the backtest Monte Carlo; the development window in blocks; the idea on related instruments, each at its own session (a warning, not a fail) | `robustness` | runs |

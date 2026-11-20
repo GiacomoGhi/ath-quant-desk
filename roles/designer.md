@@ -20,6 +20,10 @@ Every design is written before anyone sees a result.
 4. **Design** (below), check for duplicates as the scout does, and write the lead (below).
 5. Go back to 1, at most three designs a run: a few careful designs beat many loose ones.
 
+A design's **evidence tier** (templates/lead.md) is that of the weakest source it rests on; a design resting on
+reasoning alone is D. A design in a family `pipeline/focus.md` lists as **closed** is not written unless a source
+gives that family tier-A evidence.
+
 ## Designing an idea
 
 - **Start from a mechanism, never from a pattern.** Name who is on the other side and why they keep paying: a flow

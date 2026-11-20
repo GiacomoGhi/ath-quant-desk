@@ -11,7 +11,10 @@ parameter defaults, departures from the source) is made from the source and from
 
 1. **Check the limit.** If `pipeline/2-build/ready/` holds `wip.cards_waiting_build` cards or more, stop.
 2. **Claim** the first lead in `pipeline/focus.md`'s order for the analyst that is still in `pipeline/1-research/ready/`;
-   with no order, the oldest ([pipeline](../docs/pipeline.md#claiming-and-passing-on)).
+   with no order, the highest **evidence tier** first (A before B before C before D, the lead's `evidence_tier`), the
+   oldest within a tier ([pipeline](../docs/pipeline.md#claiming-and-passing-on)). Confirm the tier from what you
+   read and write it in the card. A lead in a family `focus.md` lists as **closed** is retired at gate R ("closed
+   family", with the family's failed cards), unless it brings tier-A evidence; it is never tested.
 3. **Read the source in full**: method, data, results and robustness sections, not just the abstract. Read the
    replications or critiques you can find. Check every link and date the lead gives. If you can't open the full
    source, retire the lead ("source not available") — a card is never written from an abstract.
